@@ -32,6 +32,8 @@ public:
     void destroy();
     void clear();
 public:
+    uint32_t hash(State& state);
+public:
     bool get_entry(uint32_t hash, int& accumulate);
     bool add_entry(uint32_t hash, int accumulate);
 public:

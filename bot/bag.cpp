@@ -5,7 +5,7 @@ namespace LemonTea
 
 Bag::Bag()
 {
-    memset(this->data, false, 7);
+    memset(this->data, true, 7);
 };
 
 Bag::Bag(bool init[7])

@@ -17,6 +17,7 @@ class State
 {
 public:
     Board board;
+    PieceType current;
     PieceType hold;
     Bag bag;
     int next;
@@ -24,9 +25,9 @@ public:
     int ren;
 public:
     State();
-    State(Board board, PieceType hold, bool bag[7], int next, int b2b, int ren);
+    State(Board board, PieceType current, PieceType hold, bool bag[7], int next, int b2b, int ren);
 public:
-    void advance(Piece& placement, std::vector<PieceType>& queue, Lock& lock);
+    void advance(Piece& placement, std::vector<PieceType>& queue, PieceType fpiece, Lock& lock);
 };
 
 };

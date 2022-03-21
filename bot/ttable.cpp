@@ -16,7 +16,7 @@ TTable::~TTable()
 
 void TTable::init(uint32_t size)
 {
-    assert(size & (size - 1) == 0);
+    assert((size & (size - 1)) == 0);
     if (this->bucket != nullptr) {
         assert(false);
         return;
@@ -29,7 +29,6 @@ void TTable::init(uint32_t size)
 void TTable::destroy()
 {
     if (this->bucket == nullptr) {
-        assert(false);
         return;
     }
     delete[] this->bucket;
@@ -38,6 +37,17 @@ void TTable::destroy()
 void TTable::clear()
 {
     memset(this->bucket, 0, sizeof(TBucket) * this->size);
+};
+
+uint32_t TTable::hash(State& state)
+{
+    char buffer[90] = { 0 };
+    memcpy(buffer, state.board.data, 80);
+    memcpy(buffer + 80, state.bag.data, 7);
+    buffer[87] = state.hold;
+    buffer[88] = char(state.b2b & 0b11111111);
+    buffer[89] = char(state.ren & 0b11111111);
+    return xxhash32((const void*)buffer, 90, 31);
 };
 
 bool TTable::get_entry(uint32_t hash, int& accumulate)
@@ -78,7 +88,6 @@ bool TTable::add_entry(uint32_t hash, int accumulate)
         this->bucket[index].slot[slot_empty].accumulate = accumulate;
         return true;
     }
-    // if (slot_smallest != -1 && this->bucket[index].slot[slot_smallest].accumulate < accumulate) {
     if (slot_smallest != -1) {
         this->bucket[index].slot[slot_smallest].hash = hash;
         this->bucket[index].slot[slot_smallest].accumulate = accumulate;

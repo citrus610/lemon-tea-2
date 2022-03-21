@@ -6,6 +6,7 @@ namespace LemonTea
 State::State()
 {
     this->board = Board();
+    this->current = PIECE_NONE;
     this->hold = PIECE_NONE;
     this->bag = Bag();
     this->next = 0;
@@ -13,7 +14,7 @@ State::State()
     this->ren = 0;
 };
 
-State::State(Board board, PieceType hold, bool bag[7], int next, int b2b, int ren)
+State::State(Board board, PieceType current, PieceType hold, bool bag[7], int next, int b2b, int ren)
 {
     this->board = board;
     this->hold = hold;
@@ -23,20 +24,50 @@ State::State(Board board, PieceType hold, bool bag[7], int next, int b2b, int re
     this->bag = Bag(bag);
 };
 
-void State::advance(Piece& placement, std::vector<PieceType>& queue, Lock& lock)
+void State::advance(Piece& placement, std::vector<PieceType>& queue, PieceType fpiece, Lock& lock)
 {
-    if (placement.type != queue[this->next]) {
-        bool hold_empty = this->hold == PIECE_NONE;
-        this->hold = queue[this->next];
-        if (hold_empty) {
-            this->bag.update(queue[this->next]);
-            ++this->next;
-            assert(this->next < int(queue.size()));
-            assert(placement.type == queue[this->next]);
+    if (fpiece != PIECE_NONE) {
+        if (this->current == PIECE_NONE) {
+            assert(this->hold != PIECE_NONE);
+            if (placement.type != fpiece) {
+                assert(placement.type == this->hold);
+                this->hold = fpiece;
+            }
+            this->bag.update(fpiece);
+        }
+        else {
+            assert(this->hold == PIECE_NONE);
+            if (placement.type != this->current) {
+                assert(placement.type == fpiece);
+                this->hold = this->current;
+                this->bag.update(this->current);
+                this->current = fpiece;
+            }
+            this->bag.update(this->current);
+            this->current = PIECE_NONE;
         }
     }
-    this->bag.update(queue[this->next]);
-    ++this->next;
+    else {
+        if (placement.type != this->current) {
+            bool hold_empty = this->hold == PIECE_NONE;
+            this->hold = this->current;
+            if (hold_empty) {
+                assert(this->next < int(queue.size()));
+                assert(placement.type == queue[this->next]);
+                this->bag.update(this->current);
+                this->current = queue[this->next];
+                ++this->next;
+            }
+        }
+        this->bag.update(this->current);
+        if (this->next < int(queue.size())) {
+            this->current = queue[this->next];
+            ++this->next;
+        }
+        else {
+            this->current = PIECE_NONE;
+        }
+    }
 
     lock.softdrop = !this->board.is_above_stack(placement);
     bool tspin = this->board.is_tspin(placement);
