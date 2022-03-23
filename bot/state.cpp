@@ -24,51 +24,69 @@ State::State(Board board, PieceType current, PieceType hold, bool bag[7], int ne
     this->bag = Bag(bag);
 };
 
-void State::advance(Piece& placement, std::vector<PieceType>& queue, PieceType fpiece, Lock& lock)
+void State::advance(Piece& placement, std::vector<PieceType>& queue, Lock& lock)
 {
-    if (fpiece != PIECE_NONE) {
-        if (this->current == PIECE_NONE) {
-            assert(this->hold != PIECE_NONE);
-            if (placement.type != fpiece) {
-                assert(placement.type == this->hold);
-                this->hold = fpiece;
-            }
-            this->bag.update(fpiece);
-        }
-        else {
-            assert(this->hold == PIECE_NONE);
-            if (placement.type != this->current) {
-                assert(placement.type == fpiece);
-                this->hold = this->current;
-                this->bag.update(this->current);
-                this->current = fpiece;
-            }
+    if (placement.type != this->current) {
+        PieceType previous_hold = this->hold;
+        this->hold = this->current;
+        if (previous_hold == PIECE_NONE) {
+            assert(this->next < int(queue.size()));
+            assert(placement.type == queue[this->next]);
             this->bag.update(this->current);
-            this->current = PIECE_NONE;
-        }
-    }
-    else {
-        if (placement.type != this->current) {
-            bool hold_empty = this->hold == PIECE_NONE;
-            this->hold = this->current;
-            if (hold_empty) {
-                assert(this->next < int(queue.size()));
-                assert(placement.type == queue[this->next]);
-                this->bag.update(this->current);
-                this->current = queue[this->next];
-                ++this->next;
-            }
-        }
-        this->bag.update(this->current);
-        if (this->next < int(queue.size())) {
             this->current = queue[this->next];
             ++this->next;
         }
         else {
-            this->current = PIECE_NONE;
+            assert(placement.type == previous_hold);
         }
     }
+    this->bag.update(this->current);
+    if (this->next < int(queue.size())) {
+        this->current = queue[this->next];
+        ++this->next;
+    }
+    else {
+        this->current = PIECE_NONE;
+    }
 
+    this->lock(placement, lock);
+};
+
+void State::advance(Piece& placement, PieceType fpiece, Lock& lock)
+{
+    assert(fpiece != PIECE_NONE);
+
+    PieceType next_piece = PIECE_NONE;
+    if (this->current == PIECE_NONE) {
+        assert(this->hold != PIECE_NONE);
+        this->current = fpiece;
+    }
+    else {
+        assert(this->hold == PIECE_NONE);
+        next_piece = fpiece;
+    }
+
+    if (placement.type != this->current) {
+        PieceType previous_hold = this->hold;
+        this->hold = this->current;
+        if (previous_hold == PIECE_NONE) {
+            assert(placement.type == next_piece);
+            this->bag.update(this->current);
+            this->current = next_piece;
+            next_piece = PIECE_NONE;
+        }
+        else {
+            assert(placement.type == previous_hold);
+        }
+    }
+    this->bag.update(this->current);
+    this->current = next_piece;
+
+    this->lock(placement, lock);
+};
+
+void State::lock(Piece& placement, Lock& lock)
+{
     lock.softdrop = !this->board.is_above_stack(placement);
     bool tspin = this->board.is_tspin(placement);
     placement.place(this->board);
@@ -99,6 +117,21 @@ void State::advance(Piece& placement, std::vector<PieceType>& queue, PieceType f
         this->ren = 0;
         lock.type = LOCK_NONE;
     }
+};
+
+void State::print()
+{
+    using namespace std;
+
+    cout << "Board:" << endl;
+    this->board.print();
+    cout << "Current: " << convert_piece_to_str(this->current) << endl;
+    cout << "Hold:    " << convert_piece_to_str(this->hold) << endl;
+    cout << "Bag:     ";
+    this->bag.print();
+    cout << "Next:    " << this->next << endl;
+    cout << "B2b:     " << this->b2b << endl;
+    cout << "Ren:     " << this->ren << endl;
 };
 
 };

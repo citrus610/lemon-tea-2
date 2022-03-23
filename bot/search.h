@@ -1,12 +1,15 @@
 #pragma once
 
 #include "layer.h"
+#include "gen.h"
+#include "eval.h"
 
 namespace LemonTea
 {
 
 constexpr size_t SEARCH_WIDTH = 200;
-constexpr size_t SEARCH_WIDTH_FORECAST = 500;
+constexpr size_t SEARCH_WIDTH_PRUNE = 20;
+constexpr size_t SEARCH_WIDTH_FORECAST = 300;
 
 struct Candidate
 {
@@ -26,6 +29,9 @@ public:
 public:
     Layer layer[2];
 public:
+    Generator generator;
+    Evaluator evaluator;
+public:
     Search();
     ~Search();
 public:
@@ -35,10 +41,10 @@ public:
     void clear();
 public:
     void force();
-    void expand(Node& parent, Layer& layer, int& count);
-    void expand_forecast(Node& parent, Layer& layer, int& count);
-    void think(int& layer, int& index, int& width, int& count);
-    void search(int iteration);
+    void expand(Node& parent, Layer& layer, int width, int& count);
+    void expand_forecast(Node& parent, Layer& layer, int width, int& count);
+    void think(int& pre_layer, int& new_layer, int& index, int& width, bool& forecast, int& count, int& depth);
+    void search(int iteration, int& count, int& depth);
 public:
     void request(int incomming, Candidate& result);
 public:

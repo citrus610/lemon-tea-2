@@ -155,7 +155,7 @@ int Board::clear_line()
             high_part = high_part >> 4;
             break;
         case 0b0101:
-            high_part = ((high_part >> 1) & 0b0001) | ((high_part >> 3) << 2);
+            high_part = ((high_part >> 1) & 0b0001) | ((high_part >> 3) << 1);
             break;
         case 0b1001:
             high_part = ((high_part >> 1) & 0b0011) | ((high_part >> 4) << 2);

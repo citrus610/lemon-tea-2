@@ -42,4 +42,17 @@ bool& Bag::operator [] (int index)
     return this->data[index];
 };
 
+void Bag::print()
+{
+    using namespace std;
+
+    for (int i = 0; i < 7; ++i) {
+        if (this->data[i]) {
+            cout << convert_piece_to_str(PieceType(i)) << " ";
+        }
+    }
+
+    cout << endl;
+};
+
 };

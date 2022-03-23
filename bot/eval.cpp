@@ -126,7 +126,12 @@ void Evaluator::evaluate(Node& node, Piece placement, Lock lock)
     }
 
     // B2b
-    node.score.accumulate += (node.state.b2b > 1) * this->heuristic.accumulate.b2b;
+    if (lock.type == LOCK_CLEAR_4 ||
+        lock.type == LOCK_TSPIN_1 ||
+        lock.type == LOCK_TSPIN_2 ||
+        lock.type == LOCK_TSPIN_3) {
+        node.score.accumulate += (node.state.b2b > 1) * this->heuristic.accumulate.b2b;
+    }
 
     // Ren
     int ren = REN_LUT[std::min(node.state.ren, REN_LUT_SIZE - 1)];

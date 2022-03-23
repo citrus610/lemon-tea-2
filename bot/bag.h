@@ -18,6 +18,8 @@ public:
     int size();
 public:
     bool& operator [] (int index);
+public:
+    void print();
 };
 
 };
