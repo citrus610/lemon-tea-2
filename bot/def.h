@@ -9,12 +9,14 @@
 #include <chrono>
 #include <vector>
 #include <array>
+#include <unordered_map>
 #include <cassert>
 #include <algorithm>
 #include <bitset>
 #include <bit>
 #include <thread>
 #include <mutex>
+#include <atomic>
 #include <condition_variable>
 #include "../lib/avec.h"
 #include "../lib/hash.h"

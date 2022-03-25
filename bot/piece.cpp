@@ -25,6 +25,11 @@ bool Piece::operator == (Piece& other)
     return (this->x == other.x) && (this->y == other.y) && (this->type == other.type) && (this->rotation == other.rotation);
 };
 
+bool Piece::operator == (const Piece& other)
+{
+    return (this->x == other.x) && (this->y == other.y) && (this->type == other.type) && (this->rotation == other.rotation);
+};
+
 bool Piece::move_right(Board& board)
 {
     if (!board.is_colliding(this->x + 1, this->y, this->type, this->rotation)) {

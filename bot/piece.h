@@ -19,6 +19,7 @@ public:
     Piece(int8_t x, int8_t y, PieceType t, PieceRotation r);
 public:
     bool operator == (Piece& other);
+    bool operator == (const Piece& other);
 public:
     bool move_right(Board& board);
     bool move_left(Board& board);
