@@ -14,7 +14,7 @@ Search::Search()
 
 Search::~Search()
 {
-
+    
 };
 
 bool Search::init(std::vector<PieceType>& queue)
@@ -62,12 +62,47 @@ bool Search::init(std::vector<PieceType>& queue)
     return true;
 };
 
+bool Search::init(Board& board, PieceType hold, std::vector<PieceType>& queue, Bag& bag, int b2b, int ren)
+{
+    // Only accept queue with 2 or more pieces
+    if (int(queue.size()) < 2) {
+        assert(false);
+        return false;
+    }
+
+    // Set state
+    this->queue = queue;
+    this->root = Node();
+    this->root.state.board = board;
+    this->root.state.current = this->queue[0];
+    this->root.state.hold = hold;
+    this->root.state.bag = bag;
+    this->root.state.next = 1;
+    this->root.state.b2b = b2b;
+    this->root.state.ren = ren;
+
+    // Init memory
+    this->candidate.reserve(128);
+    this->layer[0].init(std::max(SEARCH_WIDTH, SEARCH_WIDTH_FORECAST));
+    this->layer[1].init(std::max(SEARCH_WIDTH, SEARCH_WIDTH_FORECAST));
+
+    // Reset generator & evaluator
+    this->generator = Generator();
+    this->evaluator.heuristic = DEFAULT_HEURISTIC();
+
+    // Clear memory & force first search
+    this->clear();
+    this->force();
+
+    return true;
+};
+
 bool Search::advance(Piece placement, std::vector<PieceType>& next)
 {
     // Check if valid placement
     int placement_index = -1;
     for (int i = 0; i < int(this->candidate.size()); ++i) {
-        if (this->candidate[i].placement == placement) {
+        if (this->candidate[i].placement.get_normalize() == placement.get_normalize()) {
             placement_index = i;
             break;
         }

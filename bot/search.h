@@ -36,6 +36,7 @@ public:
     ~Search();
 public:
     bool init(std::vector<PieceType>& queue);
+    bool init(Board& board, PieceType hold, std::vector<PieceType>& queue, Bag& bag, int b2b, int ren);
     bool advance(Piece placement, std::vector<PieceType>& next);
     void reset(Board& board, int b2b, int ren);
     void clear();
@@ -57,6 +58,27 @@ static bool operator < (Candidate& a, Candidate& b)
         return a.spike < b.spike;
     }
     return a.visit < b.visit;
+};
+
+static void bench_search()
+{
+    Search search;
+    std::vector<PieceType> queue = { PIECE_I, PIECE_L, PIECE_O, PIECE_Z, PIECE_J };
+
+    search.init(queue);
+    int count = search.candidate.size();
+    int depth = 1;
+
+    int64_t time = 0;
+    auto time_start = std::chrono::high_resolution_clock::now();
+    search.search(2500, count, depth);
+    auto time_stop = std::chrono::high_resolution_clock::now();
+    time += std::chrono::duration_cast<std::chrono::milliseconds>(time_stop - time_start).count();
+
+    std::cout << "time:  " << int(time) << " ms" << std::endl; 
+    std::cout << "node:  " << count << std::endl; 
+    std::cout << "depth: " << depth << std::endl; 
+    std::cout << "nps:   " << int(int64_t(count) / time) << " knodes/s" << std::endl;
 };
 
 };
