@@ -114,7 +114,7 @@ bool Thread::advance(Piece placement, std::vector<PieceType> next)
         }
     }
     this->flag_advance.test_and_set();
-    this->flag_advance.wait(true);
+    // this->flag_advance.wait(true);
 
     return true;
 };
@@ -135,7 +135,7 @@ bool Thread::reset(Board board, int b2b, int ren)
         }
     }
     this->flag_reset.test_and_set();
-    this->flag_reset.wait(true);
+    // this->flag_reset.wait(true);
 
     return true;
 };
