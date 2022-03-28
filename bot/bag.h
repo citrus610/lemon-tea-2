@@ -14,6 +14,7 @@ public:
     Bag(bool init[7]);
 public:
     void update(PieceType next);
+    void deupdate(PieceType next);
 public:
     int size();
 public:

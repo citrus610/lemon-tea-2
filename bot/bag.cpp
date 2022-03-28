@@ -28,6 +28,20 @@ void Bag::update(PieceType next)
     }
 };
 
+void Bag::deupdate(PieceType next)
+{
+    if (this->data[0] == true &&
+        this->data[1] == true &&
+        this->data[2] == true &&
+        this->data[3] == true &&
+        this->data[4] == true &&
+        this->data[5] == true &&
+        this->data[6] == true) {
+        memset(this->data, false, 7);
+    }
+    this->data[next] = true;
+};
+
 int Bag::size()
 {
     int result = this->data[0];
