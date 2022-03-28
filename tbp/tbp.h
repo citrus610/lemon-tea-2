@@ -213,6 +213,16 @@ namespace frontend
         e = ((it != std::end(m)) ? it : std::begin(m))->first;
     };
 
+    class Randomizer 
+    {
+    public:
+        std::vector<Piece> bag_state;
+    public:
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(Randomizer,
+            bag_state
+        )
+    };
+
     class Start 
     {
     public:
@@ -221,13 +231,15 @@ namespace frontend
         uint32_t combo;
         bool back_to_back;
         std::array<std::array<std::optional<Cell>, 10>, 40> board;
+        Randomizer randomizer;
     public:
         NLOHMANN_DEFINE_TYPE_INTRUSIVE(Start,
             hold,
             queue,
             combo,
             back_to_back, 
-            board
+            board,
+            randomizer
         )
     };
 

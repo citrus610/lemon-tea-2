@@ -126,6 +126,8 @@ int main()
 
         case FrontendMessageKind::Start:
         {
+            thread.stop();
+            
             new_piece.clear();
 
             auto start_message = message.get<tbp::frontend::Start>();
@@ -155,8 +157,14 @@ int main()
             }
 
             // Set bag
-            // TODO: bag
-            LemonTea::Bag bag = LemonTea::Bag();
+            LemonTea::Bag bag;
+            memset(bag.data, false, 7);
+            for (auto piece : start_message.randomizer.bag_state) {
+                bag.data[convert_piece_tbp_to_lt(piece)] = true;
+            }
+            for (int i = int(queue.size()) - 1; i >=0; --i) {
+                bag.deupdate(queue[i]);
+            }
 
             // Set b2b
             int b2b = start_message.back_to_back;
@@ -164,9 +172,9 @@ int main()
             // Set ren
             int ren = start_message.combo + 1;
 
-            std::cerr << "[DBG] started!\n";
+            // std::cerr << "[DBG] started!\n";
             thread.start(board, hold, queue, bag, b2b, ren);
-            std::cerr << "thread started!\n";
+            // std::cerr << "thread started!\n";
 
             break;
         }
@@ -174,13 +182,13 @@ int main()
         case FrontendMessageKind::Suggest:
         {
             LemonTea::Plan plan;
-            std::cerr << "Getting suggestion...\n";
+            // std::cerr << "Getting suggestion...\n";
             if (!thread.request(0, plan)) {
-                std::cerr << "Error getting suggestion.\n";
+                // std::cerr << "Error getting suggestion.\n";
                 thread.stop();
                 return 0;
             }
-            std::cerr << "Got suggestion.\n" << "\n";
+            // std::cerr << "Got suggestion.\n" << "\n";
 
             tbp::bot::Suggestion suggestion;
 
@@ -204,9 +212,9 @@ int main()
                 });
             }
 
-            std::cerr << "Sending suggestion.\n";
+            // std::cerr << "Sending suggestion.\n";
             send_message(BotMessageKind::Suggestion, suggestion);
-            std::cerr << "Sent suggestion.\n" << "\n";
+            // std::cerr << "Sent suggestion.\n" << "\n";
 
             break;
         }
@@ -223,14 +231,14 @@ int main()
                 convert_rotation_tbp_to_lt(play_message.move.location.orientation)
             );
 
-            std::cerr << "Advancing state...\n";
+            // std::cerr << "Advancing state...\n";
             if (!thread.advance(piece, new_piece)) {
-                std::cerr << "Error advancing state...\n";
+                // std::cerr << "Error advancing state...\n";
                 thread.stop();
                 return 0;
             }
 
-            std::cerr << "Advanced state...\n" << "\n";
+            // std::cerr << "Advanced state...\n" << "\n";
             new_piece.clear();
 
             break;
@@ -246,7 +254,7 @@ int main()
         case FrontendMessageKind::Stop:
         {
             thread.stop();
-            std::cerr << "Stop lemon tea...\n";
+            // std::cerr << "Stop lemon tea...\n";
             break;
         }
         
