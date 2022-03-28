@@ -114,7 +114,6 @@ bool Thread::advance(Piece placement, std::vector<PieceType> next)
         }
     }
     this->flag_advance.test_and_set();
-    // this->flag_advance.wait(true);
 
     return true;
 };
@@ -135,7 +134,6 @@ bool Thread::reset(Board board, int b2b, int ren)
         }
     }
     this->flag_reset.test_and_set();
-    // this->flag_reset.wait(true);
 
     return true;
 };
@@ -167,6 +165,7 @@ bool Thread::request(int incomming, Plan& plan)
     plan.root = root.state;
     plan.result = candidate.node.state;
     plan.eval = candidate.visit / total;
+    Pathfinder::search(root.state.board, plan.placement, plan.move);
 
     return true;
 };
