@@ -3,173 +3,185 @@
 namespace LemonTea
 {
 
-int PathfinderNode::get_time()
+PathfinderNode::PathfinderNode()
 {
-    std::vector<InputType> input;
-    move_to_input(this->move, input);
-    return int(input.size());
+    this->placement = Piece();
+    this->move.reserve(32);
+    this->move.clear();
+    this->time = 0;
 };
 
-int PathfinderNode::get_score(Piece destination)
+bool PathfinderNode::attempt(Board& board, MoveType move)
 {
-    int x2 = (this->placement.x - destination.x) * (this->placement.x - destination.x);
-    int y2 = (this->placement.y - destination.y) * (this->placement.y - destination.y);
-    int r = std::abs(this->placement.rotation - destination.rotation);
-    int r2 = r * r;
-    if (r == 3) r2 = 1;
-    return x2 + y2 + r2;
-};
+    bool success = false;
+    Piece previous = this->placement;
 
-bool PathfinderNode::cmp(PathfinderNode& other)
-{
-    if (this->get_time() == other.get_time()) {
-        return this->move.size() < other.move.size();
+    switch (move)
+    {
+    case MOVE_RIGHT:
+        success = this->placement.move_right(board);
+        break;
+    case MOVE_LEFT:
+        success = this->placement.move_left(board);
+        break;
+    case MOVE_CW:
+        success = this->placement.move_cw(board);
+        break;
+    case MOVE_CCW:
+        success = this->placement.move_ccw(board);
+        break;
+    case MOVE_DOWN:
+        this->placement.move_drop(board);
+        success = this->placement.y < previous.y;
+        break;
+    default:
+        break;
     }
-    return this->get_time() < other.get_time();
+
+    if (!success) {
+        return false;
+    }
+
+    if (!this->move.empty() && this->move.back() == move) {
+        this->time += 1;
+    }
+
+    this->move.push_back(move);
+    this->time += 1;
+
+    if (move == MOVE_DOWN) {
+        this->time += std::abs(previous.y - this->placement.y) * 2;
+    }
+
+    return true;
 };
 
-bool PathfinderNode::cmp(PathfinderNode& other, Piece destination)
+bool PathfinderNode::operator < (PathfinderNode& other)
 {
-    if (this->get_score(destination) == other.get_score(destination)) {
-        return this->cmp(other);
+    // if (this->time == other.time) {
+    //     return std::count(this->move.begin(), this->move.end(), MOVE_DOWN) < std::count(other.move.begin(), other.move.end(), MOVE_DOWN);
+    // }
+    // return this->time < other.time;
+
+    if (std::count(this->move.begin(), this->move.end(), MOVE_DOWN) == std::count(other.move.begin(), other.move.end(), MOVE_DOWN)) {
+        return this->time < other.time;
     }
-    return this->get_score(destination) == other.get_score(destination);
+    return std::count(this->move.begin(), this->move.end(), MOVE_DOWN) < std::count(other.move.begin(), other.move.end(), MOVE_DOWN);
+};
+
+bool PathfinderNode::operator > (PathfinderNode& other)
+{
+    // if (this->time == other.time) {
+    //     return std::count(this->move.begin(), this->move.end(), MOVE_DOWN) > std::count(other.move.begin(), other.move.end(), MOVE_DOWN);
+    // }
+    // return this->time > other.time;
+
+    if (std::count(this->move.begin(), this->move.end(), MOVE_DOWN) == std::count(other.move.begin(), other.move.end(), MOVE_DOWN)) {
+        return this->time > other.time;
+    }
+    return std::count(this->move.begin(), this->move.end(), MOVE_DOWN) > std::count(other.move.begin(), other.move.end(), MOVE_DOWN);
+};
+
+bool PathfinderNode::operator == (PathfinderNode& other)
+{
+    return this->time == other.time && std::count(this->move.begin(), this->move.end(), MOVE_DOWN) == std::count(other.move.begin(), other.move.end(), MOVE_DOWN);
+};
+
+PathfinderMap::PathfinderMap()
+{
+    this->clear();
+};
+
+bool PathfinderMap::get(Piece placement, PathfinderNode& node)
+{
+    node = this->data[placement.x][placement.y][placement.rotation];
+    return !node.move.empty();
+};
+
+bool PathfinderMap::add(Piece placement, PathfinderNode& node)
+{
+    if (this->data[placement.x][placement.y][placement.rotation].move.empty()) {
+        this->data[placement.x][placement.y][placement.rotation] = node;
+        return true;
+    }
+
+    if (!(node > this->data[placement.x][placement.y][placement.rotation])) {
+        this->data[placement.x][placement.y][placement.rotation] = node;
+        return true;
+    }
+
+    return false;
+};
+
+void PathfinderMap::clear()
+{
+    for (int x = 0; x < 10; ++x) {
+        for (int y = 0; y < 25; ++y) {
+            for (int r = 0; r < 4; ++r) {
+                this->data[x][y][r].placement = Piece(x, y, PIECE_NONE, PieceRotation(r));
+                this->data[x][y][r].move.clear();
+                this->data[x][y][r].time = 0;
+            }
+        }
+    }
 };
 
 void Pathfinder::search(Board board, Piece destination, std::vector<MoveType>& move)
 {
-    move.reserve(64);
     move.clear();
 
-    if (destination.type == PIECE_NONE ||
-        board.is_colliding(destination) ||
-        board.get_drop_distance(destination) > 0) {
-        return;
-    }
-
     std::vector<PathfinderNode> queue;
-    std::vector<PathfinderNode> found;
-    Pathfinder::expand_onstack(board, destination.type, queue);
+    std::vector<PathfinderNode> locks;
+    PathfinderMap map_queue;
+    PathfinderMap map_locks;
 
-    for (auto node : queue) {
-        if (node.placement.get_normalize() == destination.get_normalize()) {
-            move = node.move;
-            if (move.back() != MOVE_DOWN) {
-                move.push_back(MOVE_DOWN);
-            }
+    PathfinderNode init = PathfinderNode();
+
+    init.placement = Piece(4, 19, destination.type, PIECE_UP);
+    if (board.is_colliding(init.placement)) {
+        init.placement.y = 20;
+        if (board.is_colliding(init.placement)) {
+            move.push_back(MOVE_DOWN);
             return;
         }
     }
 
-    std::make_heap
-    (
-        queue.begin(), 
-        queue.end(), 
-        [&] (PathfinderNode& a, PathfinderNode& b) { return b.cmp(a, destination); }
-    );
+    queue.push_back(init);
+    map_queue.add(init.placement, init);
 
     while (!queue.empty())
     {
-        PathfinderNode node = queue[0];
-        std::pop_heap
-        (
-            queue.begin(), 
-            queue.end(), 
-            [&] (PathfinderNode& a, PathfinderNode& b) { return b.cmp(a, destination); }
-        );
+        PathfinderNode node = queue.back();
         queue.pop_back();
 
-        if (node.placement.get_normalize() == destination.get_normalize()) {
-            move = node.move;
-            if (move.back() != MOVE_DOWN) {
-                move.push_back(MOVE_DOWN);
-            }
-            return;
-        }
+        Pathfinder::expand(board, node, queue, map_queue);
+        Pathfinder::lock(board, node, locks, map_locks);
+    }
 
-        std::vector<PathfinderNode> children;
-        Pathfinder::expand(board, node, children, true);
+    PathfinderNode final;
+    map_locks.get(destination.get_normalize(), final);
+    move = final.move;
 
-        for (auto child : children) {
-            int index_queue = Pathfinder::index(child, queue);
-            int index_found = Pathfinder::index(child, found);
-
-            if (index_queue == -1 && index_found == -1) {
-                queue.push_back(child);
-                std::push_heap
-                (
-                    queue.begin(), 
-                    queue.end(), 
-                    [&] (PathfinderNode& a, PathfinderNode& b) { return b.cmp(a, destination); }
-                );
-            }
-
-            if (index_queue == -1 && index_found != -1) {
-                if (child.cmp(found[index_found], destination)) {
-                    found[index_found] = child;
-                    queue.push_back(child);
-                    std::push_heap
-                    (
-                        queue.begin(), 
-                        queue.end(), 
-                        [&] (PathfinderNode& a, PathfinderNode& b) { return b.cmp(a, destination); }
-                    );
-                }
-            }
-
-            if (index_queue != -1 && index_found == -1) {
-                if (child.cmp(queue[index_queue], destination)) {
-                    queue[index_queue] = child;
-                    std::make_heap
-                    (
-                        queue.begin(), 
-                        queue.end(), 
-                        [&] (PathfinderNode& a, PathfinderNode& b) { return b.cmp(a, destination); }
-                    );
-                }
-            }
-
-            if (index_queue != -1 && index_found != -1) {
-                if (child.cmp(found[index_found], destination)) {
-                    found[index_found] = child;
-                }
-                if (child.cmp(queue[index_queue], destination)) {
-                    queue[index_queue] = child;
-                    std::make_heap
-                    (
-                        queue.begin(), 
-                        queue.end(), 
-                        [&] (PathfinderNode& a, PathfinderNode& b) { return b.cmp(a, destination); }
-                    );
-                }
-            }
-        }
-
-        found.push_back(node);
+    if (move.empty() || move.back() != MOVE_DOWN) {
+        move.push_back(MOVE_DOWN);
     }
 };
 
-void Pathfinder::expand(Board board, PathfinderNode& node, std::vector<PathfinderNode>& children, bool drop)
+void Pathfinder::expand(Board board, PathfinderNode& node, std::vector<PathfinderNode>& queue, PathfinderMap& map_queue)
 {
-    if (drop) {
-        PathfinderNode n_drop = node;
-        n_drop.placement.move_drop(board);
-        if (n_drop.placement.y < node.placement.y) {
-            n_drop.move.push_back(MOVE_DOWN);
-            children.push_back(n_drop);
-        }
+    PathfinderNode n_drop = node;
+    if (n_drop.attempt(board, MOVE_DOWN)) {
+        Pathfinder::add(n_drop, queue, map_queue);
     }
 
     PathfinderNode n_right = node;
-    if (n_right.placement.move_right(board)) {
-        n_right.move.push_back(MOVE_RIGHT);
-        children.push_back(n_right);
+    if (n_right.attempt(board, MOVE_RIGHT)) {
+        Pathfinder::add(n_right, queue, map_queue);
     }
 
     PathfinderNode n_left = node;
-    if (n_left.placement.move_left(board)) {
-        n_left.move.push_back(MOVE_LEFT);
-        children.push_back(n_left);
+    if (n_left.attempt(board, MOVE_LEFT)) {
+        Pathfinder::add(n_left, queue, map_queue);
     }
 
     if (node.placement.type == PIECE_O) {
@@ -177,103 +189,60 @@ void Pathfinder::expand(Board board, PathfinderNode& node, std::vector<Pathfinde
     }
 
     PathfinderNode n_cw = node;
-    if (n_cw.placement.move_cw(board)) {
-        n_cw.move.push_back(MOVE_CW);
-        children.push_back(n_cw);
+    if (n_cw.attempt(board, MOVE_CW)) {
+        Pathfinder::add(n_cw, queue, map_queue);
     }
 
     PathfinderNode n_ccw = node;
-    if (n_ccw.placement.move_ccw(board)) {
-        n_ccw.move.push_back(MOVE_CCW);
-        children.push_back(n_ccw);
+    if (n_ccw.attempt(board, MOVE_CCW)) {
+        Pathfinder::add(n_ccw, queue, map_queue);
     }
 };
 
-void Pathfinder::expand_onstack(Board board, PieceType type, std::vector<PathfinderNode>& onstack)
+void Pathfinder::lock(Board board, PathfinderNode& node, std::vector<PathfinderNode>& locks, PathfinderMap& map_locks)
 {
-    onstack.reserve(64);
-    onstack.clear();
+    node.placement.move_drop(board);
+    node.placement.normalize();
 
-    std::vector<PathfinderNode> open;
-    std::vector<PathfinderNode> close;
-    open.reserve(128);
-    close.reserve(128);
-
-    PathfinderNode init;
-    init.placement = Piece(int8_t(4), int8_t(19), type, PIECE_UP);
-    if (board.is_colliding(init.placement)) {
-        init.placement.y = 20;
-        if (board.is_colliding(init.placement)) {
-            return;
-        }
+    if (!node.move.empty() && (node.move.back() == MOVE_CW || node.move.back() == MOVE_CCW)) {
+        node.time -= 1;
     }
 
-    open.push_back(init);
-    init.placement.move_drop(board);
-    init.move.push_back(MOVE_DOWN);
-    onstack.push_back(init);
+    if (node.move.empty() || node.move.back() != MOVE_DOWN) {
+        node.move.push_back(MOVE_DOWN);
+        node.time += 1;
+    }
 
-    while (!open.empty())
-    {
-        PathfinderNode node = open[0];
-        open[0] = open.back();
-        open.pop_back();
+    if (!map_locks.add(node.placement, node)) {
+        return;
+    }
 
-        std::vector<PathfinderNode> children;
-        children.clear();
-        Pathfinder::expand(board, node, children, false);
+    int index = Pathfinder::index(node, locks);
 
-        for (auto child : children) {
-            int index_open = Pathfinder::index(child, open);
-            int index_close = Pathfinder::index(child, close);
+    if (index == -1) {
+        locks.push_back(node);
+    }
+    else if (node < locks[index]) {
+        locks[index] = node;
+    }
+};
 
-            if (index_open == -1 && index_close == -1) {
-                open.push_back(child);
-            }
+void Pathfinder::add(PathfinderNode& node, std::vector<PathfinderNode>& queue, PathfinderMap& map_queue)
+{
+    if (!map_queue.add(node.placement, node)) {
+        return;
+    }
 
-            if (index_open == -1 && index_close != -1) {
-                if (!(close[index_close].cmp(child))) {
-                    close[index_close] = child;
-                    open.push_back(child);
-                }
-            }
+    int index = Pathfinder::index(node, queue);
 
-            if (index_open != -1 && index_close == -1) {
-                if (child.cmp(open[index_open])) {
-                    open[index_open] = child;
-                }
-                else if (child.get_time() == open[index_open].get_time() && child.move.size() == open[index_open].move.size()) {
-                    open.push_back(child);
-                }
-            }
-
-            if (index_open != -1 && index_close != -1) {
-                if (!(close[index_close].cmp(child))) {
-                    close[index_close] = child;
-                }
-                if (child.cmp(open[index_open])) {
-                    open[index_open] = child;
-                }
-                if (child.get_time() == open[index_open].get_time() && child.move.size() == open[index_open].move.size()) {
-                    open.push_back(child);
-                }
-            }
-
-            child.placement.move_drop(board);
-            child.move.push_back(MOVE_DOWN);
-
-            int index = Pathfinder::index(child, onstack);
-            if (index == -1) {
-                onstack.push_back(child);
-            }
-            else {
-                if (child.cmp(onstack[index])) {
-                    onstack[index] = child;
-                }
-            }
-        }
-
-        close.push_back(node);
+    if (index == -1) {
+        queue.push_back(node);
+    }
+    else if (node < queue[index]) {
+        queue[index] = node;
+    }
+    else if (node == queue[index]) {
+        queue.push_back(node);
     }
 };
 

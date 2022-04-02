@@ -1,37 +1,37 @@
 #include <iostream>
+#include <windows.h>
+
 #include "../bot/thread.h"
+#include "tetris.h"
+
+using namespace std;
 
 int main()
 {
-    using namespace std;
-    using namespace LemonTea;
+    srand((unsigned int)time(NULL));
 
-    Thread thread;
+    TetrisGame::Tetris game(64, 32, 16);
+    game.start();
 
-    std::vector<PieceType> queue = { PIECE_I, PIECE_L, PIECE_O, PIECE_Z, PIECE_J, PIECE_T, PIECE_S };
-    thread.start(Board(), PIECE_NONE, queue, Bag(), 0, 0);
-    auto time_1 = chrono::high_resolution_clock::now();
+    // LemonTea::Board board;
+    // board[9] = 0b00111111;
+    // board[8] = 0b00111111;
+    // board[7] = 0b00011111;
+    // board[6] = 0b00000111;
+    // board[5] = 0b00000001;
+    // board[4] = 0b00000000;
+    // board[3] = 0b00001101;
+    // board[2] = 0b00011111;
+    // board[1] = 0b00111111;
+    // board[0] = 0b11111111;
 
-    Plan plan;
+    // LemonTea::Generator gen;
+    // gen.generate(board, LemonTea::PIECE_T);
 
-    for (int i = 0; i < 15; ++i) {
-        cin.get();
-        thread.request(0, plan);
-        auto time_2 = chrono::high_resolution_clock::now();
-        int64_t time = chrono::duration_cast<chrono::milliseconds>(time_2 - time_1).count();
-        int nps = 0;
-        if (int(time) != 0) {
-            nps = plan.node / int(time);
-        }
-        cout << "id:   " << i << endl;
-        cout << "node: " << plan.node << endl;
-        cout << "time: " << int(time) << " ms" << endl;
-        cout << "nps:  " << nps << " knodes/s" << endl;
+    // for (auto placement : gen.locks) {
+    //     LemonTea::print_path(board, placement);
+    // }
 
-        thread.advance(plan.placement, queue);
-        time_1 = chrono::high_resolution_clock::now();
-    }
-
-    cin.get();
+    // std::cin.get();
     return 0;
 };

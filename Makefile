@@ -7,9 +7,9 @@ endif
 
 STATIC_LIB = -luser32 -lgdi32 -lopengl32 -lgdiplus -lShlwapi -ldwmapi -lstdc++fs -lsetupapi -lhid -static
 
-.PHONY: all client tbp clean makedir
+.PHONY: all client tbp ppt clean makedir
 
-all: client
+all: client tbp ppt
 
 client: makedir
 	@echo Building Lemon Tea client...
@@ -21,6 +21,11 @@ tbp: makedir
 	@$(CXX) $(CXXFLAGS) "bot\*.cpp" "tbp\*.cpp" -o "bin\tbp\tbp.exe"
 	@echo Finished building Lemon Tea tbp!
 
+ppt: makedir
+	@echo Building Lemon Tea Puyo Puyo Tetris...
+	@$(CXX) $(CXXFLAGS) "bot\*.cpp" "ppt\*.cpp" "lib\ppt_sync\libppt_sync.dll.lib" $(STATIC_LIB) -o bin\ppt\ppt.exe
+	@echo Finished building Lemon Tea Puyo Puyo Tetris!
+
 clean: makedir
 	@echo Cleaning the bin directory
 	@rmdir /s /q bin
@@ -30,5 +35,8 @@ makedir:
 	@IF NOT exist bin ( mkdir bin )
 	@IF NOT exist bin\client ( mkdir bin\client )
 	@IF NOT exist bin\tbp ( mkdir bin\tbp )
+	@IF NOT exist bin\ppt ( mkdir bin\ppt )
+	@IF NOT exist bin\ppt\libppt_sync.dll ( copy lib\ppt_sync\libppt_sync.dll bin\ppt )
+	@IF NOT exist bin\ppt\ppt-sync.exe ( copy lib\ppt_sync\ppt-sync.exe bin\ppt )
 
 .DEFAULT_GOAL := client

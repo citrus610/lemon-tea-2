@@ -17,6 +17,11 @@ struct Plan
     double eval;
 };
 
+struct ThreadOption
+{
+    Heuristic heuristic = DEFAULT_HEURISTIC();
+};
+
 struct ThreadAdvance
 {
     Piece placement;
@@ -53,12 +58,13 @@ public:
     Thread();
     ~Thread();
 public:
-    bool start(Board board, PieceType hold, std::vector<PieceType> queue, Bag bag, int b2b, int ren);
+    bool start(Board board, PieceType hold, std::vector<PieceType> queue, Bag bag, int b2b, int ren, ThreadOption option);
     bool stop();
 public:
     bool advance(Piece placement, std::vector<PieceType> next);
     bool reset(Board board, int b2b, int ren);
     bool request(int incomming, Plan& plan);
+    bool is_running();
 private:
     void clear();
 };

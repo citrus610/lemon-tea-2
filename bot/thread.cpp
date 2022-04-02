@@ -13,7 +13,7 @@ Thread::~Thread()
     this->stop();
 };
 
-bool Thread::start(Board board, PieceType hold, std::vector<PieceType> queue, Bag bag, int b2b, int ren)
+bool Thread::start(Board board, PieceType hold, std::vector<PieceType> queue, Bag bag, int b2b, int ren, ThreadOption option)
 {
     if (this->thread != nullptr || this->flag_running.test()) {
         return false;
@@ -21,6 +21,7 @@ bool Thread::start(Board board, PieceType hold, std::vector<PieceType> queue, Ba
 
     this->clear();
 
+    this->search.evaluator.heuristic = option.heuristic;
     this->search.init(board, hold, queue, bag, b2b, ren);
 
     this->flag_running.test_and_set();
@@ -168,6 +169,11 @@ bool Thread::request(int incomming, Plan& plan)
     Pathfinder::search(root.state.board, plan.placement, plan.move);
 
     return true;
+};
+
+bool Thread::is_running()
+{
+    return this->flag_running.test();
 };
 
 void Thread::clear()

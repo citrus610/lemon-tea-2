@@ -16,6 +16,7 @@ enum InputType
     INPUT_DROP,
     INPUT_DROP_CW,
     INPUT_DROP_CCW,
+    INPUT_HOLD,
     INPUT_NONE
 };
 
@@ -24,24 +25,41 @@ class PathfinderNode
 public:
     Piece placement;
     std::vector<MoveType> move;
+    int time;
 public:
-    int get_time();
-    int get_score(Piece destination);
+    PathfinderNode();
 public:
-    bool cmp(PathfinderNode& other);
-    bool cmp(PathfinderNode& other, Piece destination);
+    bool attempt(Board& board, MoveType move);
+public:
+    bool operator < (PathfinderNode& other);
+    bool operator > (PathfinderNode& other);
+    bool operator == (PathfinderNode& other);
+};
+
+class PathfinderMap
+{
+public:
+    PathfinderNode data[10][25][4];
+public:
+    PathfinderMap();
+public:
+    bool get(Piece placement, PathfinderNode& node);
+    bool add(Piece placement, PathfinderNode& node);
+public:
+    void clear();
 };
 
 class Pathfinder
 {
 public:
     static void search(Board board, Piece destination, std::vector<MoveType>& move);
-    static void expand(Board board, PathfinderNode& node, std::vector<PathfinderNode>& children, bool drop);
-    static void expand_onstack(Board board, PieceType type, std::vector<PathfinderNode>& onstack);
+    static void expand(Board board, PathfinderNode& node, std::vector<PathfinderNode>& queue, PathfinderMap& map_queue);
+    static void lock(Board board, PathfinderNode& node, std::vector<PathfinderNode>& locks, PathfinderMap& map_locks);
+    static void add(PathfinderNode& node, std::vector<PathfinderNode>& queue, PathfinderMap& map_queue);
     static int index(PathfinderNode& node, std::vector<PathfinderNode>& queue);
 };
 
-static void move_to_input(std::vector<MoveType>& move, std::vector<InputType>& input)
+static void convert_move_to_input(std::vector<MoveType>& move, std::vector<InputType>& input)
 {
     input.clear();
 

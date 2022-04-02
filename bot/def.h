@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <time.h>
 #include <cmath>
 #include <chrono>
@@ -173,6 +174,31 @@ static char convert_piece_to_str(PieceType piece)
         break;
     default:
         return ' ';
+        break;
+    }
+};
+
+static std::string convert_move_to_str(MoveType move)
+{
+    switch (move)
+    {
+    case MOVE_RIGHT:
+        return "RIGHT";
+        break;
+    case MOVE_LEFT:
+        return "LEFT";
+        break;
+    case MOVE_CW:
+        return "CW";
+        break;
+    case MOVE_CCW:
+        return "CCW";
+        break;
+    case MOVE_DOWN:
+        return "DOWN";
+        break;
+    default:
+        return "";
         break;
     }
 };

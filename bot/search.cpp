@@ -10,6 +10,8 @@ Search::Search()
     this->candidate.clear();
     this->layer[0] = Layer();
     this->layer[1] = Layer();
+    this->generator = Generator();
+    this->evaluator.heuristic = DEFAULT_HEURISTIC();
 };
 
 Search::~Search()
@@ -53,7 +55,6 @@ bool Search::init(std::vector<PieceType>& queue)
 
     // Reset generator & evaluator
     this->generator = Generator();
-    this->evaluator.heuristic = DEFAULT_HEURISTIC();
 
     // Clear memory & force first search
     this->clear();
@@ -88,7 +89,6 @@ bool Search::init(Board& board, PieceType hold, std::vector<PieceType>& queue, B
 
     // Reset generator & evaluator
     this->generator = Generator();
-    this->evaluator.heuristic = DEFAULT_HEURISTIC();
 
     // Clear memory & force first search
     this->clear();
@@ -366,7 +366,7 @@ void Search::pick(Node& root, std::vector<Candidate> candidate, int incomming, C
     root.state.board.get_height(height);
     int max_height_center = *std::max_element(height + 3, height + 7);
 
-    std::sort(candidate.data(), candidate.data() + candidate.size(), [&] (Candidate& a, Candidate& b) { return b < a; });
+    std::sort(candidate.begin(), candidate.end(), [&] (Candidate& a, Candidate& b) { return b < a; });
     for (int i = 0; i < int(candidate.size()); ++i) {
         if (max_height_center + incomming - candidate[i].spike <= 20) {
             result = candidate[i];
