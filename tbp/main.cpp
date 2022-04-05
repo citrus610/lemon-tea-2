@@ -173,7 +173,7 @@ int main()
             int ren = start_message.combo + 1;
 
             // std::cerr << "[DBG] started!\n";
-            thread.start(board, hold, queue, bag, b2b, ren);
+            thread.start(board, hold, queue, bag, b2b, ren, {LemonTea::DEFAULT_HEURISTIC()});
             // std::cerr << "thread started!\n";
 
             break;

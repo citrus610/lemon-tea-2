@@ -62,36 +62,36 @@ constexpr Heuristic DEFAULT_HEURISTIC()
 {
     Heuristic result;
 
-    result.accumulate.clear[0] = -288;
-    result.accumulate.clear[1] = -226;
-    result.accumulate.clear[2] = -149;
-    result.accumulate.clear[3] = 278;
+    result.accumulate.clear[0] = -292;
+    result.accumulate.clear[1] = -229;
+    result.accumulate.clear[2] = -146;
+    result.accumulate.clear[3] = 281;
     result.accumulate.tspin[0] = 57;
     result.accumulate.tspin[1] = 412;
     result.accumulate.tspin[2] = 719;
     result.accumulate.pc = 1500;
-    result.accumulate.waste_clear = -237;
+    result.accumulate.waste_clear = -234;
     result.accumulate.waste_time = -17;
     result.accumulate.waste_T = -156;
-    result.accumulate.b2b = 173;
-    result.accumulate.ren = 141;
+    result.accumulate.b2b = 174;
+    result.accumulate.ren = 138;
 
     result.evaluation.height = -40;
     result.evaluation.height_10 = -150;
     result.evaluation.height_15 = -600;
-    result.evaluation.bumpiness = -11;
-    result.evaluation.bumpiness_s = -25;
+    result.evaluation.bumpiness = -7;
+    result.evaluation.bumpiness_s = -22;
     result.evaluation.row_t = -20;
     result.evaluation.hole_a = -564;
     result.evaluation.hole_b = -469;
     result.evaluation.blocked = -19;
-    result.evaluation.well = 64;
-    result.evaluation.sidewell = -23;
+    result.evaluation.well = 58;
+    result.evaluation.sidewell = -22;
     result.evaluation.structure[0] = 113;
     result.evaluation.structure[1] = 146;
     result.evaluation.structure[2] = 244;
     result.evaluation.structure[3] = 507;
-    result.evaluation.b2b = 135;
+    result.evaluation.b2b = 141;
 
     return result;
 };

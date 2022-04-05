@@ -156,6 +156,10 @@ bool Thread::request(int incomming, Plan& plan)
         plan.depth = this->depth;
     }
 
+    if (plan.depth < 5) {
+        return false;
+    }
+
     double total = 0;
     for (int i = 0; i < int(candidates.size()); ++i) {
         total += double(candidates[i].visit);
