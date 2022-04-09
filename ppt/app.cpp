@@ -302,10 +302,10 @@ void app::update_bot()
             bot_input_queue.clear();
 
             // Check bot death
-            if (this->temporary_bot_solution.placement.type == LemonTea::PIECE_NONE) {
-                this->end_bot();
-                return;
-            }
+            // if (this->temporary_bot_solution.placement.type == LemonTea::PIECE_NONE) {
+            //     this->end_bot();
+            //     return;
+            // }
 
             // Set bot log
             bot_node = this->temporary_bot_solution.node;
