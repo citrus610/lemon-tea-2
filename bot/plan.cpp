@@ -58,11 +58,6 @@ bool PathfinderNode::attempt(Board& board, MoveType move)
 
 bool PathfinderNode::operator < (PathfinderNode& other)
 {
-    // if (this->time == other.time) {
-    //     return std::count(this->move.begin(), this->move.end(), MOVE_DOWN) < std::count(other.move.begin(), other.move.end(), MOVE_DOWN);
-    // }
-    // return this->time < other.time;
-
     if (std::count(this->move.begin(), this->move.end(), MOVE_DOWN) == std::count(other.move.begin(), other.move.end(), MOVE_DOWN)) {
         return this->time < other.time;
     }
@@ -71,11 +66,6 @@ bool PathfinderNode::operator < (PathfinderNode& other)
 
 bool PathfinderNode::operator > (PathfinderNode& other)
 {
-    // if (this->time == other.time) {
-    //     return std::count(this->move.begin(), this->move.end(), MOVE_DOWN) > std::count(other.move.begin(), other.move.end(), MOVE_DOWN);
-    // }
-    // return this->time > other.time;
-
     if (std::count(this->move.begin(), this->move.end(), MOVE_DOWN) == std::count(other.move.begin(), other.move.end(), MOVE_DOWN)) {
         return this->time > other.time;
     }
@@ -129,6 +119,11 @@ void PathfinderMap::clear()
 void Pathfinder::search(Board board, Piece destination, std::vector<MoveType>& move)
 {
     move.clear();
+
+    if (destination.type == PIECE_NONE || board.get_drop_distance(destination) != 0) {
+        move.push_back(MOVE_DOWN);
+        return;
+    }
 
     std::vector<PathfinderNode> queue;
     std::vector<PathfinderNode> locks;

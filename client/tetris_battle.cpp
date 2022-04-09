@@ -95,10 +95,10 @@ void TetrisBattle::update_player(TetrisPlayer& player, LemonTea::Thread& bot, st
         }
 
         // Check gameover
-        if (plan.placement.type == LemonTea::PIECE_NONE) {
-            player.gameover = true;
-            return;
-        }
+        // if (plan.placement.type == LemonTea::PIECE_NONE) {
+        //     player.do_drop();
+        //     return;
+        // }
 
         // Check garbage or misdrop
         if (!(plan.root.board == player.board)) {

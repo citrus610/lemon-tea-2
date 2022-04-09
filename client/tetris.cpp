@@ -24,12 +24,8 @@ void Tetris::update(double dt)
     this->battle.update();
     if (this->battle.is_gameover()) {
         this->battle.unload();
-        this->draw_text(0, 0, std::wstring(L"GAME OVER! 3"), ConsoleEngine::COLOR_BG_WHITE);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        this->draw_text(0, 0, std::wstring(L"GAME OVER! 2"), ConsoleEngine::COLOR_BG_WHITE);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        this->draw_text(0, 0, std::wstring(L"GAME OVER! 1"), ConsoleEngine::COLOR_BG_WHITE);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        this->draw_text(1, 1, std::wstring(L"GAME OVER!"), ConsoleEngine::COLOR_FG_WHITE);
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         this->end();
     }
 };

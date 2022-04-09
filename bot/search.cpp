@@ -341,6 +341,10 @@ void Search::search(int iteration, int& count, int& depth)
     assert(!this->candidate.empty());
     assert(this->candidate.size() == this->layer[0].data.size());
 
+    if (this->candidate.empty()) {
+        return;
+    }
+
     bool forecast = false;
     int pre_layer = 0;
     int new_layer = 1;
@@ -362,6 +366,13 @@ void Search::request(int incomming, Candidate& result)
 
 void Search::pick(Node& root, std::vector<Candidate> candidate, int incomming, Candidate& result)
 {
+    result = Candidate();
+    result.placement.type = PIECE_NONE;
+
+    if (candidate.empty()) {
+        return;
+    }
+
     int height[10];
     root.state.board.get_height(height);
     int max_height_center = *std::max_element(height + 3, height + 7);
@@ -373,8 +384,6 @@ void Search::pick(Node& root, std::vector<Candidate> candidate, int incomming, C
             return;
         }
     }
-
-    result = Candidate();
 };
 
 };

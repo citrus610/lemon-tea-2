@@ -46,15 +46,16 @@ bool Thread::start(Board board, PieceType hold, std::vector<PieceType> queue, Ba
                 {
                     std::unique_lock<std::mutex> lk(mutex);
                     if (!this->buffer_advance.empty()) {
-                        this->search.advance(this->buffer_advance[0].placement, this->buffer_advance[0].next);
-                        this->buffer_advance.clear();
-                        this->forecast = false;
-                        this->pre_layer = 0;
-                        this->new_layer = 1;
-                        this->index = 0;
-                        this->width = SEARCH_WIDTH;
-                        this->count = this->search.candidate.size();
-                        this->depth = 1;
+                        if (this->search.advance(this->buffer_advance[0].placement, this->buffer_advance[0].next)) {
+                            this->buffer_advance.clear();
+                            this->forecast = false;
+                            this->pre_layer = 0;
+                            this->new_layer = 1;
+                            this->index = 0;
+                            this->width = SEARCH_WIDTH;
+                            this->count = this->search.candidate.size();
+                            this->depth = 1;
+                        }
                     }
                 }
                 this->flag_advance.clear();
