@@ -71,7 +71,7 @@ static void bench_search()
 
     int64_t time = 0;
     auto time_start = std::chrono::high_resolution_clock::now();
-    search.search(2500, count, depth);
+    search.search(3000, count, depth);
     auto time_stop = std::chrono::high_resolution_clock::now();
     time += std::chrono::duration_cast<std::chrono::milliseconds>(time_stop - time_start).count();
 

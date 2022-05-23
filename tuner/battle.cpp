@@ -77,17 +77,19 @@ void Battle::update_player(Player& player, LemonTea::Search& bot, std::vector<Le
     if (player.is_clearline()) return;
     
     if (movement.empty()) {
+        int iter = 1750;
+
         // Check garbage or misdrop
         if (!(bot.root.state.board == player.board)) {
             assert(false);
             bot.reset(player.board, player.b2b, player.ren);
-            return;
+            iter = 750;
         }
 
         // Search
         int bot_node = 0;
         int bot_depth = 0;
-        bot.search(500, bot_node, bot_depth);
+        bot.search(iter, bot_node, bot_depth);
 
         // Get solution
         LemonTea::Candidate plan;

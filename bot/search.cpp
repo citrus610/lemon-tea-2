@@ -195,7 +195,7 @@ void Search::force()
         }
     }
 
-    std::sort(this->layer[0].data.data(), this->layer[0].data.data() + this->layer[0].data.size(), [&] (Node& a, Node& b) { return b < a; });
+    std::sort(this->layer[0].data.begin(), this->layer[0].data.end(), [&] (Node& a, Node& b) { return b < a; });
 };
 
 void Search::clear()
@@ -283,6 +283,10 @@ void Search::expand_forecast(Node& parent, Layer& layer, int width, int& count)
 
 void Search::think(int& pre_layer, int& new_layer, int& index, int& width, bool& forecast, int& count, int& depth)
 {
+    if (index < 0 || index >= this->layer[pre_layer].data.size()) {
+        return;
+    }
+
     if (!forecast) {
         this->expand(this->layer[pre_layer].data[index], this->layer[new_layer], width, count);
     }

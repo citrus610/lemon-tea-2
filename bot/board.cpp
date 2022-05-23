@@ -135,6 +135,11 @@ int Board::clear_line()
     if (mask == 0) {
         return 0;
     }
+#ifdef USE_PEXT
+    for (int i = 0; i < 10; ++i) {
+        this->data[i] = _pext_u64(this->data[i], ~mask);
+    }
+#else
     int mask_tzcnt = std::countr_zero(mask);
     mask = mask >> mask_tzcnt;
     for (int i = 0; i < 10; ++i) {
@@ -172,6 +177,7 @@ int Board::clear_line()
         }
         this->data[i] = low_part | (high_part << mask_tzcnt);
     }
+#endif
     return std::popcount(mask);
 };
 

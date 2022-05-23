@@ -215,6 +215,8 @@ bool app::OnUserUpdate(float dt)
             this->end_bot();
             if (this->gameover_counter == 2) {
                 this->vxbox.set_button_off(this->vxbox_index);
+                std::ofstream o("gameover.txt");
+                o.close();
             }
             this->status_raw_str.clear();
             this->status_raw_str.append("GAMEOVER");
@@ -281,10 +283,7 @@ void app::init_bot()
     this->ppt.state_hold = ' ';
 
     // Turn off all inputs
-    this->vxbox.set_dpad_off(this->vxbox_index);
-    this->vxbox.set_button_A(this->vxbox_index, FALSE);
-    this->vxbox.set_button_B(this->vxbox_index, FALSE);
-    this->vxbox.set_button_LB(this->vxbox_index, FALSE);
+    this->vxbox.set_button_off(this->vxbox_index);
 }
 
 void app::update_bot()
@@ -346,7 +345,6 @@ void app::update_bot()
         }
 
         if (!this->ppt.pressing_hold) {
-
             // Push moves to bot input vec
             //     Add hard drop move at the end of the queue
             bot_input_queue.clear();
@@ -390,10 +388,7 @@ void app::update_bot()
             uintptr_t player_address = this->ppt.get_player_address(this->ppt_player_index);
 
             // Turn off all inputs
-            this->vxbox.set_dpad_off(this->vxbox_index);
-            this->vxbox.set_button_A(this->vxbox_index, FALSE);
-            this->vxbox.set_button_B(this->vxbox_index, FALSE);
-            this->vxbox.set_button_LB(this->vxbox_index, FALSE);
+            this->vxbox.set_button_off(this->vxbox_index);
 
             switch (bot_input_queue[0])
             {
@@ -461,10 +456,7 @@ void app::update_bot()
 void app::end_bot()
 {
     this->bot_input_queue.clear();
-    this->vxbox.set_dpad_off(this->vxbox_index);
-    this->vxbox.set_button_A(this->vxbox_index, FALSE);
-    this->vxbox.set_button_B(this->vxbox_index, FALSE);
-    this->vxbox.set_button_LB(this->vxbox_index, FALSE);
+    this->vxbox.set_button_off(this->vxbox_index);
     this->bot.stop();
 }
 

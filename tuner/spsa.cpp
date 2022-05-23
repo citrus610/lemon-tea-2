@@ -37,31 +37,31 @@ void Spsa::vary_weight(LemonTea::Heuristic& base, LemonTea::Heuristic& v1, Lemon
     // VARY_WEIGHT_STATIC_PARAMETER(evaluation.height, 10);
     // VARY_WEIGHT_STATIC_PARAMETER(evaluation.height_10, 10);
     // VARY_WEIGHT_PARAMETER(evaluation.height_15, 100);
-    // VARY_WEIGHT_STATIC_PARAMETER(evaluation.bumpiness, 10 + (rand() % 11));
-    // VARY_WEIGHT_STATIC_PARAMETER(evaluation.bumpiness_s, 10);
+    VARY_WEIGHT_STATIC_PARAMETER(evaluation.bumpiness, 10 + (rand() % 6));
+    VARY_WEIGHT_STATIC_PARAMETER(evaluation.bumpiness_s, 5);
     // VARY_WEIGHT_PARAMETER(evaluation.row_t, 25);
-    VARY_WEIGHT_STATIC_PARAMETER(evaluation.hole_a, 10 + (rand() % 11));
-    VARY_WEIGHT_STATIC_PARAMETER(evaluation.hole_b, 10 + (rand() % 11));
-    // VARY_WEIGHT_STATIC_PARAMETER(evaluation.blocked, 10);
+    VARY_WEIGHT_STATIC_PARAMETER(evaluation.hole_a, 10 + (rand() % 21));
+    VARY_WEIGHT_STATIC_PARAMETER(evaluation.hole_b, 10 + (rand() % 21));
+    VARY_WEIGHT_STATIC_PARAMETER(evaluation.blocked, 5);
     // VARY_WEIGHT_STATIC_PARAMETER(evaluation.well, 10 + (rand() % 11));
     // VARY_WEIGHT_STATIC_PARAMETER(evaluation.sidewell, 10);
     for (int i = 0; i < 4; ++i) {
-        VARY_WEIGHT_STATIC_PARAMETER(evaluation.structure[i], 10 + (rand() % 21));
+        VARY_WEIGHT_STATIC_PARAMETER(evaluation.structure[i], 20 + (rand() % 21));
     }
-    // VARY_WEIGHT_STATIC_PARAMETER(evaluation.b2b, 10 + (rand() % 11));
+    VARY_WEIGHT_STATIC_PARAMETER(evaluation.b2b, 20 + (rand() % 6));
 
     // Attack
     for (int i = 0; i < 4; ++i) {
-        VARY_WEIGHT_STATIC_PARAMETER(accumulate.clear[i], 10 + (rand() % 11));
+        VARY_WEIGHT_STATIC_PARAMETER(accumulate.clear[i], 25 + (rand() % 21));
     }
     for (int i = 0; i < 3; ++i) {
         VARY_WEIGHT_STATIC_PARAMETER(accumulate.tspin[i], 10 + (rand() % 21));
     }
     // VARY_WEIGHT_PARAMETER(accumulate.waste_time, 25);
-    VARY_WEIGHT_STATIC_PARAMETER(accumulate.waste_clear, 10 + (rand() % 11));
-    VARY_WEIGHT_STATIC_PARAMETER(accumulate.waste_T, 10 + (rand() % 21));
-    // VARY_WEIGHT_STATIC_PARAMETER(accumulate.b2b, 10 + (rand() % 11));
-    VARY_WEIGHT_STATIC_PARAMETER(accumulate.ren, 10 + (rand() % 11));
+    // VARY_WEIGHT_STATIC_PARAMETER(accumulate.waste_clear, 10 + (rand() % 11));
+    VARY_WEIGHT_STATIC_PARAMETER(accumulate.waste_T, 20 + (rand() % 21));
+    VARY_WEIGHT_STATIC_PARAMETER(accumulate.b2b, 20 + (rand() % 11));
+    VARY_WEIGHT_STATIC_PARAMETER(accumulate.ren, 20 + (rand() % 11));
 };
 
 void Spsa::approach_value(int& base, int& v, double ap_v)

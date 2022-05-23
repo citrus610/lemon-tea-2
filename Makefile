@@ -1,8 +1,13 @@
 CXX = g++
-ifeq ($(BUILD),debug)   
+
+ifeq ($(BUILD), debug)   
 CXXFLAGS += -fdiagnostics-color=always -DUNICODE -std=c++20 -Wall -Og -g
 else
 CXXFLAGS += -DUNICODE -DNDEBUG -std=c++20 -O3 -flto -s -march=native
+endif
+
+ifeq ($(USE_PEXT), true)   
+CXXFLAGS += -DUSE_PEXT
 endif
 
 STATIC_LIB = -luser32 -lgdi32 -lopengl32 -lgdiplus -lShlwapi -ldwmapi -lstdc++fs -lsetupapi -lhid -static

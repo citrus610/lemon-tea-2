@@ -62,36 +62,36 @@ constexpr Heuristic DEFAULT_HEURISTIC()
 {
     Heuristic result;
 
-    result.accumulate.clear[0] = -292;
-    result.accumulate.clear[1] = -229;
+    result.accumulate.clear[0] = -309;
+    result.accumulate.clear[1] = -228;
     result.accumulate.clear[2] = -146;
-    result.accumulate.clear[3] = 281;
-    result.accumulate.tspin[0] = 57;
-    result.accumulate.tspin[1] = 412;
-    result.accumulate.tspin[2] = 719;
-    result.accumulate.pc = 1500;
-    result.accumulate.waste_clear = -234;
+    result.accumulate.clear[3] = 290;
+    result.accumulate.tspin[0] = 48;
+    result.accumulate.tspin[1] = 402;
+    result.accumulate.tspin[2] = 726;
+    result.accumulate.pc = 10000;
+    result.accumulate.waste_clear = -232;
     result.accumulate.waste_time = -17;
-    result.accumulate.waste_T = -156;
-    result.accumulate.b2b = 174;
-    result.accumulate.ren = 138;
+    result.accumulate.waste_T = -161;
+    result.accumulate.b2b = 184;
+    result.accumulate.ren = 140;
 
     result.evaluation.height = -40;
     result.evaluation.height_10 = -150;
     result.evaluation.height_15 = -600;
-    result.evaluation.bumpiness = -7;
-    result.evaluation.bumpiness_s = -22;
+    result.evaluation.bumpiness = -8;
+    result.evaluation.bumpiness_s = -12;
     result.evaluation.row_t = -20;
     result.evaluation.hole_a = -564;
-    result.evaluation.hole_b = -469;
-    result.evaluation.blocked = -19;
+    result.evaluation.hole_b = -467;
+    result.evaluation.blocked = -21;
     result.evaluation.well = 58;
     result.evaluation.sidewell = -22;
-    result.evaluation.structure[0] = 113;
-    result.evaluation.structure[1] = 146;
-    result.evaluation.structure[2] = 244;
-    result.evaluation.structure[3] = 507;
-    result.evaluation.b2b = 141;
+    result.evaluation.structure[0] = 99;
+    result.evaluation.structure[1] = 150;
+    result.evaluation.structure[2] = 253;
+    result.evaluation.structure[3] = 513;
+    result.evaluation.b2b = 153;
 
     return result;
 };

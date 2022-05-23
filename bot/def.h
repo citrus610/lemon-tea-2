@@ -19,6 +19,7 @@
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
+#include <x86intrin.h>
 #include "../lib/avec.h"
 #include "../lib/hash.h"
 
